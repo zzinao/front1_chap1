@@ -20,16 +20,18 @@ export function createElement(node) {
 
 function updateAttributes(target, newProps, oldProps) {
   const allProps = { ...newProps, ...oldProps };
+  
+  // newProps가 존재하지 않을때는 attribute를 전부 삭제해준다.
+  if (!newProps) {
+    const attributes = target.attributes;
+    while (attributes.length > 0) {
+      target.removeAttribute(attributes[0].name);
+    }
+    return;
+  }
+
   Object.keys(allProps).forEach((prop, idx) => {
     console.log(`props ${idx}`, prop);
-    // newProps가 존재하지 않을때는 attribute를 전부 삭제해준다.
-    if (!newProps) {
-      const attributes = target.attributes;
-      while (attributes.length > 0) {
-        target.removeAttribute(attributes[0].name);
-      }
-      return;
-    }
     // newProps들을 반복하여 각 속성과 값을 확인
     //   만약 oldProps에 같은 속성이 있고 값이 동일하다면
     //     다음 속성으로 넘어감 (변경 불필요)
