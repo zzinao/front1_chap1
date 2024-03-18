@@ -20,7 +20,7 @@ export function createElement(node) {
 
 function updateAttributes(target, newProps, oldProps) {
   const allProps = { ...newProps, ...oldProps };
-
+  
   // newProps가 존재하지 않을때는 attribute를 전부 삭제해준다.
   if (!newProps) {
     const attributes = target.attributes;
