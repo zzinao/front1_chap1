@@ -4,7 +4,7 @@ export function createHooks(callback) {
 
   const useState = (initState) => {
     if (!global.states) {
-      global.states = [];
+      resetContext();
     }
     const currentState = global.states[index] || initState;
 
@@ -14,10 +14,10 @@ export function createHooks(callback) {
       let currnetIndex = index;
       return function (value) {
         if (value !== global.states[currnetIndex]) {
-          resetContext(); // setState 호출 전에 resetContext 실행
-          // 상태 값이 변경되었을 때만 setState 호출
           global.states[currnetIndex] = value;
-          callback();
+          if (value !== currentState) {
+            callback();
+          }
         }
       };
     })();
@@ -27,8 +27,20 @@ export function createHooks(callback) {
     return [currentState, setState];
   };
 
-  const useMemo = (fn, refs) => {
-    return fn();
+  const useMemo = (fn, deps) => {
+    const prevDeps = useMemo.prevDeps || [];
+    const prevResult = useMemo.prevResult;
+
+    const dependenciesChanged =
+      !prevResult ||
+      !deps.every((dep, index) => Object.is(dep, prevDeps[index]));
+
+    if (dependenciesChanged) {
+      useMemo.prevDeps = deps;
+      useMemo.prevResult = fn();
+    }
+
+    return useMemo.prevResult;
   };
 
   const resetContext = () => {
